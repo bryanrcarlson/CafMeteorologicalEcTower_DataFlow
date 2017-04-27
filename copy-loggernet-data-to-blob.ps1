@@ -1,3 +1,8 @@
+# Dependencies
+#   * Microsoft Azure blob storage account and container
+#   * AzCopy installed on machine
+#   * A file named "blob-key.private" with the access key to the blob storage account located at same directory level as this script
+
 param([string]$dest, [string]$path, [string]$backup, [string]$logpartial)
 
 #$path = "C:\Files\LtarBoydNorth\"
@@ -33,7 +38,6 @@ if($itr -ge $numtries)
     "$([Environment]::NewLine)# Could not copy files to Azure Blob storage, aborting..." >> $log
 }
 
-#------------
 "$([Environment]::NewLine)# Moving files to backup..." >> $log
 if($LASTEXITCODE -eq 0)
     {
@@ -57,21 +61,3 @@ if($LASTEXITCODE -eq 0)
         }
     }
 }
-#--------
-
-#Get-ChildItem -Path $path -Recurse | Move-Item -Destination $backup -Verbose -WhatIf -Force *>> $log
-
-#$copied
-##if($LASTEXITCODE -eq 0) {
-#    $copied = Copy-Item $path\*.* $backup -Recurse -Force -Verbose | Tee $log
-#    #$copied
-##}
-#
-#$removed
-#foreach($file in $copied)
-#{
-#    $filename = [System.IO.Path]::GetFileName($file)
-#    Remove-Item $path\$filename -WhatIf *>> $log
-#}
-
-#Stop-Transcript
