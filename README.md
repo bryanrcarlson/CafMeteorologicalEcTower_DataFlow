@@ -1,3 +1,6 @@
+## Important
+5/9/2017: This repo may be merged with one located on Bitbucket (see link for "Datalogger code and specificiations")
+
 ## Introduction
 Files, scripts, and code for processing metereological data coming off of the various EC Towers located on the CAF LTAR sites.
 
