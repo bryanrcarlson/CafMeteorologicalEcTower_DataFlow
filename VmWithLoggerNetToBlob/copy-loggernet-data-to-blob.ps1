@@ -1,14 +1,42 @@
-# Dependencies
-#   * Microsoft Azure blob storage account and container
-#   * AzCopy installed on machine
-#   * A file named "blob-key.private" with the access key to the blob storage account located at same directory level as this script
+<#
+.SYNOPSIS
+Copies files located in specified path to an Azure Blob Storage container, moves those files to a backup directory, and logs the changes.
+.PARAMETER dest
+Azure Blob service endpoint and container
+.PARAMETER path
+Absolute directory path where the files to be copied/backedup are located
+.PARAMETER backup
+Absolute directory path where the files are to be moved to
+.PARAMETER logpartial
+Absolute directory path and prefix filename for log file (time stamp and txt extension will be added)
+.DESCRIPTION
+Version 0.1.0
+Author: Bryan Carlson
+Contact: bryan.carlson@ars.usda.gov
+Last Update: 5/11/2017
 
-param([string]$dest, [string]$path, [string]$backup, [string]$logpartial)
+Dependencies
+  * Microsoft Azure blob storage account and container
+  * AzCopy installed on machine
+  * A file named "blob-key.private" with the access key to the blob storage account located at same directory level as this script
+.NOTES
+Intended to be called by Campbell Scientific's Task Master after sucessfully downloading CR3000 data using LoggerNet.
+.EXAMPLE
+./copy-loggernet-data-to-blob.ps1 -dest "https://ltarcafdatastream.blob.core.windows.net/ectower-cookeast/raw" -path "C:\Files\EcTowerData\CookEast" -backup "C:\Files\EcTowerDataBackup\CookEast" -logpartial "C:\Files\logs\copy-local-to-blob\cookeast"
+.LINK
+https://github.com/bryanrcarlson/LtarMeteorologicalEcTower_DataFlow
+#>
 
-$path = "C:\Users\brcarlson\Desktop\EcTower\CookEast"
-$backup = "C:\Users\brcarlson\Desktop\EcTowerBackup\CookEast"
-$dest = "https://ltarcafdatastream.blob.core.windows.net/ectower-cookeast/raw"
-$logpartial = "C:\Users\brcarlson\Desktop\logs\cookeast"
+#$path = "C:\Users\brcarlson\Desktop\EcTower\CookEast"
+#$backup = "C:\Users\brcarlson\Desktop\EcTowerBackup\CookEast"
+#$dest = "https://ltarcafdatastream.blob.core.windows.net/ectower-cookeast/raw"
+#$logpartial = "C:\Users\brcarlson\Desktop\logs\cookeast"
+
+param(
+    [Parameter(Mandatory=$true)][string]$dest, 
+    [Parameter(Mandatory=$true)][string]$path, 
+    [Parameter(Mandatory=$true)][string]$backup, 
+    [Parameter(Mandatory=$true)][string]$logpartial)
 
 # Program expects a file containing the Azure Access Key to the blob storage account.  Put the key in quotes. 
 $key = Get-Content .\blob-key.private
