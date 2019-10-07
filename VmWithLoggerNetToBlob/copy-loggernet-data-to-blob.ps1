@@ -10,7 +10,7 @@ Absolute directory path where the files are to be moved to
 .PARAMETER logpartial
 Absolute directory path and prefix filename for log file (time stamp and txt extension will be added)
 .DESCRIPTION
-Version 0.1.2
+Version 0.1.3
 Author: Bryan Carlson
 Contact: bryan.carlson@usda.gov
 Last Update: 10/07/2019
@@ -75,7 +75,7 @@ if($itr -ge $numtries)
 "$([Environment]::NewLine)# Moving files to backup..." >> $log
 if($LASTEXITCODE -eq 0)
 {
-    robocopy.exe $path $backup /S /MOV >> $log
+    robocopy.exe $path $backup /S /MOV /XX >> $log
 }
 
 # Clean up data backups that are more than 14 days old
