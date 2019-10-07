@@ -10,7 +10,7 @@ Absolute directory path where the files are to be moved to
 .PARAMETER logpartial
 Absolute directory path and prefix filename for log file (time stamp and txt extension will be added)
 .DESCRIPTION
-Version 0.1.1
+Version 0.1.2
 Author: Bryan Carlson
 Contact: bryan.carlson@usda.gov
 Last Update: 10/07/2019
@@ -82,10 +82,20 @@ if($LASTEXITCODE -eq 0)
 "$([Environment]::NewLine)# Deleting 14 day old backups..." >> $log
 $CurrentDate = Get-Date
 $DateToDeleteData = $CurrentDate.AddDays($timeToLiveData)
-Get-ChildItem -Path $backup -Recurse -File | Where-Object { $_.LastWriteTime -lt $DateToDeleteData } | Remove-Item -Force
+$dataCnt
+Get-ChildItem -Path $backup -Recurse -File | Where-Object { $_.LastWriteTime -lt $DateToDeleteData } | ForEach-Object {
+    Remove-Item $_.FullName
+    if ($?) {$dataCnt++}
+}
+Add-Content $log -value "... deleted $dataCnt data files."
 
 # Clean up logs that are more than 120 days old
 "$([Environment]::NewLine)# Deleting 4 month old logs..." >> $log
 $DateToDeleteLogs = $CurrentDate.AddDays($timeToLiveLogs)
 $logpath = [System.IO.Path]::GetDirectoryName($log)
-Get-ChildItem -Path $logpath -Recurse -File | Where-Object { $_.LastWriteTime -lt $DateToDeleteLogs } | Remove-Item -Force
+$logCnt
+Get-ChildItem -Path $logpath -Recurse -File | Where-Object { $_.LastWriteTime -lt $DateToDeleteLogs } | ForEach-Object {
+    Remove-Item $_.FullName
+    if ($?) {$logCnt++}
+}
+Add-Content $log -value "... deleted $logCnt log files."
