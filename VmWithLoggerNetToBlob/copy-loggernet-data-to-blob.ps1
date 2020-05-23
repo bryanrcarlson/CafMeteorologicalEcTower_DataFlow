@@ -10,15 +10,15 @@ Absolute directory path where the files are to be moved to
 .PARAMETER logpartial
 Absolute directory path and prefix filename for log file (time stamp and txt extension will be added)
 .DESCRIPTION
-Version 0.1.4
+Version 0.2.0
 Author: Bryan Carlson
 Contact: bryan.carlson@usda.gov
-Last Update: 10/07/2019
+Last Update: 05/22/2020
 
 Dependencies
   * Microsoft Azure blob storage account and container
-  * AzCopy installed on machine
-  * A file named "blob-key.private" with the access key to the blob storage account located at same directory level as this script
+  * AzCopy version 10 located on machine at "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopyV1\azcopy.exe"
+  * Running on a virtual machine with a managed identity that is added as a Storage Blob Data Contributor to the RBAC of the container to upload to
 .NOTES
 Intended to be called by Campbell Scientific's Task Master after sucessfully downloading CR3000 data using LoggerNet.
 .EXAMPLE
@@ -27,9 +27,9 @@ Intended to be called by Campbell Scientific's Task Master after sucessfully dow
 https://github.com/bryanrcarlson/LtarMeteorologicalEcTower_DataFlow
 #>
 
-#$path = "C:\Users\brcarlson\Desktop\EcTower\CookEast"
+#$path = "C:\Files\test\*"
 #$backup = "C:\Users\brcarlson\Desktop\EcTowerBackup\CookEast"
-#$dest = "https://ltarcafdatastream.blob.core.windows.net/ectower-cookeast/raw"
+#$dest = "https://cafltardatalake.dfs.core.windows.net/transient/CafMeteorologyECTower/FromLoggerNetOnVM"
 #$logpartial = "C:\Users\brcarlson\Desktop\logs\cookeast"
 
 param(
@@ -43,9 +43,10 @@ $timeToLiveData = "-14"
 $timeToLiveLogs = "-120"
 
 # Program expects a file containing the Azure Access Key to the blob storage account.  Put the key in quotes. 
-$key = Get-Content .\blob-key.private
+#$key = Get-Content .\blob-key.private
 
 $log = "$logpartial-$(Get-Date -f yyyyMMdd-HHmm).txt"
+$azcoppath = $path + "\*"
 
 $numtries = 5
 $itr = 0
@@ -61,7 +62,8 @@ $itr = 0
 # Copied all files in source to Azure Blog Storage
 "$([Environment]::NewLine)# Copying files to blob storage..." >> $log
 Do {
-    & "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe" /Source:$path /Dest:$dest /DestKey:$key /S /Y /XO /XN *>> $log
+	& "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopyV10\AzCopy.exe" login --identity *>> $log
+    & "C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopyV10\AzCopy.exe" copy $azcoppath $dest --recursive *>> $log
     $azcopyresult = $LASTEXITCODE 
     $itr++
 } While (($azcopyresult -ne 0) -And ($itr -lt $numtries))
